@@ -412,11 +412,21 @@ SC.MenuItemView = SC.View.extend( SC.ContentDisplay,
   },
 
   touchStart: function(evt){
+    // Setting current menu item because it was only set during mouseEntered(), which doesn't
+    // work for touch devices.
+    this.setPath('parentMenu.currentMenuItem', this);
     return YES;
   },
 
   touchEnd: function(evt){
-    return this.mouseUp(evt);
+    var ret = this.mouseUp(evt);
+
+    // Not sure the correct logic here -- trying to duplicate mouseExited()...
+    if (!this.get('hasSubMenu') && (this.getPath('parentMenu.currentMenuItem') === this)) {
+      this.setPath('parentMenu.currentMenuItem', null);
+    }
+    
+    return ret;
   },
 
   touchEntered: function(evt){
